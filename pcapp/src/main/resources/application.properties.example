@@ -1,0 +1,31 @@
+spring.application.name=pcapp
+server.port=8080
+
+# ===== MySQL（本机 8.0，Windows 服务名 MySQL80）=====
+# 复制本文件为 application.properties，再填入本机账号密码；
+# 或直接用环境变量 MYSQL_USERNAME / MYSQL_PASSWORD 覆盖
+spring.datasource.url=jdbc:mysql://localhost:3306/crea3?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+spring.datasource.username=${MYSQL_USERNAME:root}
+spring.datasource.password=${MYSQL_PASSWORD:}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# ===== JPA =====
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.open-in-view=false
+spring.jpa.show-sql=false
+
+# ===== 监控端 =====
+# 上报鉴权令牌：与 monitor/.env 的 API_TOKEN 保持一致
+app.api-token=${API_TOKEN:change-me}
+# 监控端推流服务地址（PC 从这里拉 MJPEG 转发给浏览器）
+monitor.base-url=${MONITOR_BASE_URL:http://127.0.0.1:8000}
+
+# ===== MJPEG 转发是长连接，禁用异步请求超时 =====
+spring.mvc.async.request-timeout=-1
+
+# 开发期界面资源不缓存，改样式后刷新即生效
+spring.web.resources.cache.cachecontrol.no-store=true
+
+# ===== 音视频片段上传（P4 阶段使用）=====
+spring.servlet.multipart.max-file-size=200MB
+spring.servlet.multipart.max-request-size=200MB

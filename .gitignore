@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Java
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# 运行时产物
+*.db
+*.sqlite3
+clips/
+logs/
+*.log
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 课程报告（不入库）
+*.docx
+
+# 本地工具配置
+.claude/settings.local.json
+
+# 含本机数据库密码，不入库；新机器复制 application.properties.example
+pcapp/src/main/resources/application.properties

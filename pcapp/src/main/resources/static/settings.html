@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>自适应多模态检测系统 · 参数设置</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+        <span class="mark"></span>
+        <div>
+            <strong>自适应多模态检测系统</strong>
+            <small>PC 端控制台</small>
+        </div>
+    </div>
+    <nav>
+        <a href="/">总览</a>
+        <a href="/settings.html" class="active">参数设置</a>
+    </nav>
+</header>
+
+<main>
+    <form id="config-form" class="panel form-panel">
+        <div class="panel-head">
+            <h2>运行参数</h2>
+            <span class="hint">保存后监控端在下一轮轮询时生效 · 当前 <span id="config-version">v0</span></span>
+        </div>
+
+        <fieldset>
+            <legend>时段与判定</legend>
+            <div class="fields">
+                <label>睡眠时段开始
+                    <input type="time" name="sleep_start" required>
+                </label>
+                <label>睡眠时段结束
+                    <input type="time" name="sleep_end" required>
+                </label>
+                <label>长时间静止阈值（分钟）
+                    <input type="number" name="inactivity_minutes" min="1" max="1440" required>
+                </label>
+                <label>跌倒确认时长（秒）
+                    <input type="number" name="fall_confirm_seconds" min="1" max="600" required>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>上报与灵敏度</legend>
+            <div class="fields">
+                <label>状态报告周期（秒）
+                    <input type="number" name="report_interval_seconds" min="1" max="86400" required>
+                </label>
+                <label>跌倒灵敏度（0~1）
+                    <input type="number" name="fall_confidence" min="0" max="1" step="0.01" required>
+                </label>
+                <label>声音灵敏度（0~1）
+                    <input type="number" name="sound_confidence" min="0" max="1" step="0.01" required>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>事件片段（P4 起启用）</legend>
+            <div class="fields">
+                <label>前录时长（秒）
+                    <input type="number" name="clip_pre_seconds" min="0" max="600" required>
+                </label>
+                <label>后录时长（秒）
+                    <input type="number" name="clip_post_seconds" min="0" max="600" required>
+                </label>
+                <label>保留时长（天）
+                    <input type="number" name="clip_retention_days" min="1" max="3650" required>
+                </label>
+            </div>
+        </fieldset>
+
+        <div class="actions">
+            <button type="submit">保存参数</button>
+            <span id="toast" class="toast"></span>
+        </div>
+    </form>
+</main>
+
+<script src="/settings.js"></script>
+</body>
+</html>

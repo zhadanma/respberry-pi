@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>自适应多模态检测系统 · 总览</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+        <span class="mark"></span>
+        <div>
+            <strong>自适应多模态检测系统</strong>
+            <small>PC 端控制台</small>
+        </div>
+    </div>
+    <nav>
+        <a href="/" class="active">总览</a>
+        <a href="/settings.html">参数设置</a>
+    </nav>
+</header>
+
+<main>
+    <section class="stats">
+        <div class="stat">
+            <span class="stat-label">监控端</span>
+            <span id="monitor-state" class="stat-value muted">检测中…</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">最后上报</span>
+            <span id="last-report" class="stat-value muted">—</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">报告总数</span>
+            <span id="report-count" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">告警总数</span>
+            <span id="alert-count" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">配置版本</span>
+            <span id="config-version" class="stat-value">v0</span>
+        </div>
+    </section>
+
+    <section class="grid">
+        <div class="panel">
+            <div class="panel-head">
+                <h2>实时预览</h2>
+                <span class="hint">MJPEG · 不落盘</span>
+            </div>
+            <div class="preview">
+                <img id="preview" alt="等待监控端画面">
+                <div id="preview-hint" class="preview-hint">正在连接监控端…</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2>最新告警</h2>
+                <span class="hint">阶段一为假数据</span>
+            </div>
+            <ul id="alert-list" class="alerts">
+                <li class="empty">暂无告警</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <h2>状态报告</h2>
+            <span class="hint">最近 100 条</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>设备</th>
+                    <th>上报时间</th>
+                    <th>状态</th>
+                    <th>内容</th>
+                </tr>
+                </thead>
+                <tbody id="report-body">
+                <tr><td colspan="5" class="empty">暂无报告</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>

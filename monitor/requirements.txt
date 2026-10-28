@@ -1,0 +1,29 @@
+# 监控端（Python）依赖
+# 实际安装版本 —— 2026-10-11 装于 conda 环境 crea3（Python 3.12.15）
+# 开发前中期运行在 PC；部署阶段迁移到树莓派 5（届时采集层改用 picamera2）
+
+# 深度学习框架（CPU 版：与树莓派算力更接近，且体积小）
+# 安装：pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu
+torchvision==0.29.1+cpu
+
+# 视觉模型（YOLOv8n-pose 姿态估计）
+ultralytics==8.4.175
+
+# 音频模型（YAMNet）运行时
+# 注：tflite-runtime 在 Windows 无官方 wheel，改用 ai-edge-litert
+ai-edge-litert==2.3.0
+
+# 采集与图像处理（开发期读 USB 摄像头；部署期树莓派另装 picamera2）
+opencv-python==5.0.0.93
+sounddevice==0.5.6
+pillow==12.3.0
+
+# 推流 / 本地 HTTP 服务
+flask==3.1.3
+
+# 与 PC 端通信（上报 / 拉配置）
+requests==2.34.2
+
+# 数值计算
+numpy==2.5.2
