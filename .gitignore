@@ -32,5 +32,10 @@ Thumbs.db
 # 本地工具配置
 .claude/settings.local.json
 
+# 模型权重（太大，不入库，首次运行自动下载）
+*.pt
+*.pth
+*.onnx
+
 # 含本机数据库密码，不入库；新机器复制 application.properties.example
 pcapp/src/main/resources/application.properties

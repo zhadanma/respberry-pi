@@ -1,6 +1,6 @@
-"""主调度：串联采集、推流、上报与配置轮询。
+"""主调度：串联采集、推流、检测、上报与配置轮询。
 
-阶段一使用假数据：按周期上报「系统运行正常」，不接入任何模型。
+P2 起接入视觉检测（YOLOv8n-pose），实现 A-1 跌倒 / A-2 长时间静止判定。
 """
 
 from __future__ import annotations
@@ -15,6 +15,9 @@ import cv2
 from .capture import create_camera
 from .comm import PcClient
 from .config import ConfigManager, Settings
+from .detect.vision import VisionDetector
+from .judge.fall import FallDetector
+from .judge.inactivity import InactivityDetector
 from .stream import FrameHub, create_app, start_server
 
 logger = logging.getLogger(__name__)
@@ -32,6 +35,14 @@ class MonitorApp:
             timeout=settings.http_timeout_seconds,
         )
         self.camera = create_camera(settings)
+
+        # 视觉检测与判定（P2）
+        self.vision = VisionDetector(model_name="yolov8n-pose.pt", device="cpu")
+        self.fall_detector = FallDetector()
+        self.inactivity_detector = InactivityDetector()
+        self._frame_count = 0
+        self._detect_interval = 3  # 每 3 帧做一次推理（CPU 性能限制）
+
         self._stop = threading.Event()
         self._workers: list[threading.Thread] = []
 
@@ -70,6 +81,8 @@ class MonitorApp:
         encode_params = [cv2.IMWRITE_JPEG_QUALITY, self.settings.video_jpeg_quality]
         frames = 0
         last_log = time.monotonic()
+        last_persons = []
+
         while not self._stop.is_set():
             started = time.monotonic()
             frame = self.camera.read()
@@ -77,6 +90,42 @@ class MonitorApp:
                 logger.warning("取帧失败，0.5 秒后重试")
                 self._stop.wait(0.5)
                 continue
+
+            self._frame_count += 1
+
+            # 每 N 帧做一次视觉推理（CPU 上 YOLO 较慢，抽帧推理）
+            if self._frame_count % self._detect_interval == 0:
+                persons = self.vision.detect(frame)
+                last_persons = persons
+
+                # 更新判定状态机
+                cfg = self.config.snapshot()
+                self.fall_detector.fall_confirm_seconds = cfg.fall_confirm_seconds
+                self.fall_detector.fall_confidence_threshold = cfg.fall_confidence
+                self.inactivity_detector.inactivity_seconds = cfg.inactivity_minutes * 60
+                self.inactivity_detector.sleep_start = cfg.sleep_start
+                self.inactivity_detector.sleep_end = cfg.sleep_end
+
+                # 跌倒检测
+                if self.fall_detector.update(persons):
+                    conf = self.fall_detector.current_confidence
+                    self.client.send_alert(
+                        alert_type="fall",
+                        confidence=round(conf, 2),
+                        message=f"检测到跌倒，持续 {cfg.fall_confirm_seconds} 秒未起身",
+                    )
+
+                # 长时间静止检测
+                if self.inactivity_detector.update(persons):
+                    self.client.send_alert(
+                        alert_type="inactivity",
+                        confidence=0.7,
+                        message=f"非睡眠时段静止超过 {cfg.inactivity_minutes} 分钟",
+                    )
+
+                # 在帧上画检测框（调试用）
+                frame = self.vision.draw_overlay(frame, persons)
+
             ok, buffer = cv2.imencode(".jpg", frame, encode_params)
             if ok:
                 self.hub.publish(buffer.tobytes())
@@ -86,7 +135,10 @@ class MonitorApp:
 
             now = time.monotonic()
             if now - last_log >= 60:
-                logger.info("采集正常：近 %d 秒 %d 帧（目标 %d fps）", int(now - last_log), frames, self.settings.video_fps)
+                logger.info(
+                    "采集正常：近 %d 秒 %d 帧（目标 %d fps），检测到人 %d 个",
+                    int(now - last_log), frames, self.settings.video_fps, len(last_persons),
+                )
                 frames = 0
                 last_log = now
 
