@@ -2,3 +2,7 @@
 
 邮件均由监控端直接发出，不经过 PC。
 """
+
+from .notifier import MailNotifier, MailConfig
+
+__all__ = ["MailNotifier", "MailConfig"]
